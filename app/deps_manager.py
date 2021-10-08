@@ -81,7 +81,7 @@ class CommandFileReader:
         input_line = self._freadline()
         extra_output = ''
 
-        return input_line + extra_output
+        return str(input_line) + extra_output
 
 
 if __name__ == "__main__":

@@ -7,6 +7,9 @@ class BaseCommand:
     name: str
     # TODO: uppercase validation for name
 
+    def __str__(self):
+        return self.name
+
 
 @dataclass
 class ListCommand(BaseCommand):
@@ -18,8 +21,12 @@ class ListCommand(BaseCommand):
 class InstallCommand(BaseCommand):
     item: str
 
-    def __init__(self, **kwargs):
-        self.name = "INSTALL"
+    def __init__(self, item_value):
+        self.name = "INSTALLL"
+        self.item = item_value
+
+    def __str__(self):
+        return f"{self.name} {self.item}"
 
 
 @dataclass
@@ -29,6 +36,9 @@ class RemoveCommand(BaseCommand):
     def __init__(self, item_value):
         self.name = "REMOVE"
         self.item = item_value
+
+    def __str__(self):
+        return f"{self.name} {self.item}"
 
 
 @dataclass
@@ -46,6 +56,9 @@ class DependCommand(BaseCommand):
         self.name = "DEPEND"
         self.item = item_value
         self.deps = deps_value
+
+    def __str__(self):
+        return f"{self.name} {self.item} {' '.join(self.deps)}"
 
 
 # Rusty builder
