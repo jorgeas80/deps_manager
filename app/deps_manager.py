@@ -48,7 +48,7 @@ def freadline(fp: TextIO, cb: CommandBuilder, fixed_length=FIXED_LINE_LENGTH) ->
 
     # No type validation here, command should include type validation
     command_name = line_read[0]
-    command_item = line_read[1]
+    command_item = line_read[1] if len(line_read) > 1 else None
     command_args = line_read[2:] if len(line_read) > 2 else None
 
     # Build the command

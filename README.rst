@@ -53,7 +53,7 @@ To execute the dependencies manager using the sample input file included in this
 
 `docker run --rm deps python /usr/dependency_manager/app/deps_manager.py /usr/dependency_manager/data/sample_input.txt`
 
-You will see an output like this
+You will see an output like this (TODO)
 
 .. code-block:: python
 
