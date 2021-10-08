@@ -122,6 +122,25 @@ To run flake8 linter, execute:
 
 `docker run --rm deps flake8 /usr/dependency_manager/app`
 
+
+Design
+------
+
+Main ideas:
+
+* Separate file reading / writing from command execution
+* Build and iterator to read the file, to work with just one command in each step
+* Build the registry of installed packages as a dependency tree using the DEPEND commands as guide
+
+Options to model the registry:
+
+* A dict in which each key is the package name and its associated value is a set with the names of the dep.packages
+* An actual tree, with nodes and edges
+
+First approach is way simpler and enough for this problem: for each package we just need to know the name of its dependencies.
+
+
+
 Credits
 -------
 
