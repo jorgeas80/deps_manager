@@ -116,6 +116,11 @@ To run the included tests execute:
 
 `docker run --rm deps pytest /usr/dependency_manager/tests`
 
+How to run linter
+
+To run flake8 linter, execute:
+
+`docker run --rm deps flake8 /usr/dependency_manager/app`
 
 Credits
 -------
