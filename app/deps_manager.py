@@ -80,6 +80,8 @@ class CommandFileReader:
 class CommandExecutor:
     def __init__(self, **kwargs):
         self.reg = kwargs.get('reg') or Registry()
+
+        # TODO: Create my own list type to enforce only str values
         self.installed_packages = kwargs.get('installed_packages') or list()
 
     def install_package(self, pkg: str):
@@ -98,12 +100,12 @@ class CommandExecutor:
         # Package is still needed. Cannot be removed
         for cmd, deps in self.reg.items():
             if pkg in deps:
-                print(f"{pkg} is still needed")
+                print(f"\t{pkg} is still needed")
                 return
         # Package is not a dep for any other one. It can be safely removed
         else:
             self.installed_packages.remove(pkg)
-            print(f"{pkg} successfully removed")
+            print(f"\t{pkg} successfully removed")
             # Now check its dependencies
             if pkg in self.reg.keys():
                 for subpkg in self.reg[pkg].deps:
@@ -120,10 +122,10 @@ class CommandExecutor:
             for pkg in self.installed_packages:
                 print(f"\t{pkg}")
         elif isinstance(cmd, RemoveCommand):
-            if cmd.name in self.installed_packages:
+            if cmd.item in self.installed_packages:
                 self.remove_package(cmd.item)
         elif isinstance(cmd, InstallCommand):
-            if cmd.name in self.installed_packages:
+            if cmd.item in self.installed_packages:
                 print(f"\t{cmd} is already installed")
             else:
                 self.install_package(cmd.item)
