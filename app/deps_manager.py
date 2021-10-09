@@ -89,7 +89,8 @@ class CommandExecutor:
         # Package contains deps. So, install them first
         else:
             for dep in self.reg.get(pkg):
-                self.install_package(dep)
+                if dep not in self.installed_packages:
+                    self.install_package(dep)
 
         print(f"\t{pkg} successfully installed")
 
@@ -119,10 +120,10 @@ class CommandExecutor:
             for pkg in self.installed_packages:
                 print(f"\t{pkg}")
         elif isinstance(cmd, RemoveCommand):
-            if cmd in self.installed_packages:
+            if cmd.name in self.installed_packages:
                 self.remove_package(cmd.item)
         elif isinstance(cmd, InstallCommand):
-            if cmd in self.installed_packages:
+            if cmd.name in self.installed_packages:
                 print(f"\t{cmd} is already installed")
             else:
                 self.install_package(cmd.item)
