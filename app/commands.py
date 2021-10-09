@@ -5,10 +5,9 @@ from dataclasses import dataclass
 @dataclass
 class BaseCommand:
     name: str
-    # TODO: uppercase validation for name
 
     def __str__(self):
-        return self.name
+        return self.name.upper()
 
 
 @dataclass
@@ -22,11 +21,11 @@ class InstallCommand(BaseCommand):
     item: str
 
     def __init__(self, item_value):
-        self.name = "INSTALLL"
+        self.name = "INSTALL"
         self.item = item_value
 
     def __str__(self):
-        return f"{self.name} {self.item}"
+        return f"{self.name.upper()} {self.item}"
 
 
 @dataclass
@@ -38,7 +37,7 @@ class RemoveCommand(BaseCommand):
         self.item = item_value
 
     def __str__(self):
-        return f"{self.name} {self.item}"
+        return f"{self.name.upper()} {self.item}"
 
 
 @dataclass
@@ -58,7 +57,7 @@ class DependCommand(BaseCommand):
         self.deps = deps_value
 
     def __str__(self):
-        return f"{self.name} {self.item} {' '.join(self.deps)}"
+        return f"{self.name.upper()} {self.item} {' '.join(self.deps)}"
 
 
 # Rusty builder

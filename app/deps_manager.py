@@ -2,6 +2,7 @@ import argparse
 from typing import TextIO
 from commands import *
 from constants import *
+from registry import Registry
 
 
 """
@@ -47,7 +48,7 @@ def freadline(fp: TextIO, cb: CommandBuilder, fixed_length=FIXED_LINE_LENGTH) ->
         line_read = line_read[0:fixed_length]
 
     # No type validation here, command should include type validation
-    command_name = line_read[0]
+    command_name = line_read[0].upper()
     command_item = line_read[1] if len(line_read) > 1 else None
     command_args = line_read[2:] if len(line_read) > 2 else None
 
@@ -73,15 +74,63 @@ class CommandFileReader:
         return freadline(self.fp, self.cb)
 
     def __next__(self):
-        """
-            Here we generate:
-                * Echoed input
-                * Extra input if needed (example: success or error msg)
-        """
-        input_line = self._freadline()
-        extra_output = ''
+        return self._freadline()
 
-        return str(input_line) + extra_output
+
+class CommandExecutor:
+    def __init__(self, **kwargs):
+        self.reg = kwargs.get('reg') or Registry()
+        self.installed_packages = kwargs.get('installed_packages') or list()
+
+    def install_package(self, pkg: str):
+        # Package has no deps, just add it to installed packages
+        if pkg not in self.reg.keys():
+            self.installed_packages.append(pkg)
+        # Package contains deps. So, install them first
+        else:
+            for dep in self.reg.get(pkg):
+                self.install_package(dep)
+
+        print(f"\t{pkg} successfully installed")
+
+    def remove_package(self, pkg: str):
+        # Package is still needed. Cannot be removed
+        for cmd, deps in self.reg.items():
+            if pkg in deps:
+                print(f"{pkg} is still needed")
+                return
+        # Package is not a dep for any other one. It can be safely removed
+        else:
+            self.installed_packages.remove(pkg)
+            print(f"{pkg} successfully removed")
+            # Now check its dependencies
+            if pkg in self.reg.keys():
+                for subpkg in self.reg[pkg].deps:
+                    if subpkg in self.installed_packages:
+                        self.remove_package(subpkg)
+
+    def execute(self, cmd: BaseCommand) -> str:
+        # Set dependency list for this item
+        if isinstance(cmd, DependCommand):
+            # TODO: Check for circular deps (maybe in Registry class)
+            self.reg[cmd.item] = set(cmd.deps)
+        # List existing items
+        elif isinstance(cmd, ListCommand):
+            for pkg in self.installed_packages:
+                print(f"\t{pkg}")
+        elif isinstance(cmd, RemoveCommand):
+            if cmd in self.installed_packages:
+                self.remove_package(cmd.item)
+        elif isinstance(cmd, InstallCommand):
+            if cmd in self.installed_packages:
+                print(f"\t{cmd} is already installed")
+            else:
+                self.install_package(cmd.item)
+        # End, do nothing
+        elif isinstance(cmd, EndCommand):
+            pass
+        else:
+            raise Exception(f"Unknown command {cmd}")
 
 
 if __name__ == "__main__":
@@ -89,9 +138,14 @@ if __name__ == "__main__":
 
     fp = open(args.file_name, "r")
     command_file_reader = CommandFileReader(fp)
+    command_executor = CommandExecutor()
 
-    for command_result in command_file_reader:
-        print(command_result)
+    for command in command_file_reader:
+        # First echoes the command
+        print(command)
+
+        # Now execute it
+        command_executor.execute(command)
 
     fp.close()
 
